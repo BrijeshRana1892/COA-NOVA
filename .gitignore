@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+.ipynb_checkpoints/
+# HuggingFace model cache is large; don't commit it
+~/.cache/huggingface/
