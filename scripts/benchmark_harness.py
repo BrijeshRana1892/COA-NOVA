@@ -25,7 +25,6 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend (no display needed)
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 

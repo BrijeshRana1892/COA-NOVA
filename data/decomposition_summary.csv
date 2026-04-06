@@ -1,0 +1,9 @@
+component,mean_ms,median_ms,stdev_ms,pct_of_total
+Embedding,0.1879,0.1850,0.0153,0.3
+LayerNorm,9.1564,9.0491,0.3082,14.9
+QKV Projection,13.7837,13.7763,0.2796,22.4
+Attn Core (KV+Softmax),5.4027,5.1845,0.7365,8.8
+O Projection,5.6044,5.5459,0.1933,9.1
+MLP,17.3279,17.1043,0.9742,28.2
+LM Head,1.1985,1.1715,0.0833,1.9
+Framework OH,8.9764,9.0926,1.8497,14.6
