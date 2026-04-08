@@ -80,44 +80,44 @@ def make_styles():
     s["abstract"] = ParagraphStyle(
         "abstract",
         fontName=T_ITALIC, fontSize=9, leading=11,
-        alignment=TA_JUSTIFY, spaceAfter=6,
+        alignment=TA_JUSTIFY, spaceAfter=4,
     )
     s["index_terms"] = ParagraphStyle(
         "index_terms",
         fontName=T_ROMAN, fontSize=9, leading=11,
-        alignment=TA_JUSTIFY, spaceAfter=8,
+        alignment=TA_JUSTIFY, spaceAfter=5,
     )
     s["section"] = ParagraphStyle(
         "section",
         fontName=T_BOLD, fontSize=10, leading=13,
-        alignment=TA_CENTER, spaceBefore=10, spaceAfter=4,
+        alignment=TA_CENTER, spaceBefore=4, spaceAfter=2,
         textColor=BLACK,
     )
     s["subsection"] = ParagraphStyle(
         "subsection",
         fontName=T_ITALIC, fontSize=10, leading=13,
-        alignment=TA_LEFT, spaceBefore=6, spaceAfter=3,
+        alignment=TA_LEFT, spaceBefore=3, spaceAfter=2,
     )
     s["body"] = ParagraphStyle(
         "body",
         fontName=T_ROMAN, fontSize=10, leading=12,
-        alignment=TA_JUSTIFY, spaceAfter=5,
+        alignment=TA_JUSTIFY, spaceAfter=4,
         firstLineIndent=18,
     )
     s["body_noindent"] = ParagraphStyle(
         "body_noindent",
         fontName=T_ROMAN, fontSize=10, leading=12,
-        alignment=TA_JUSTIFY, spaceAfter=5,
+        alignment=TA_JUSTIFY, spaceAfter=4,
     )
     s["caption"] = ParagraphStyle(
         "caption",
-        fontName=T_ROMAN, fontSize=8.5, leading=11,
-        alignment=TA_CENTER, spaceAfter=6, spaceBefore=4,
+        fontName=T_ROMAN, fontSize=8.5, leading=10,
+        alignment=TA_CENTER, spaceAfter=4, spaceBefore=2,
     )
     s["caption_bold"] = ParagraphStyle(
         "caption_bold",
-        fontName=T_BOLD, fontSize=8.5, leading=11,
-        alignment=TA_CENTER, spaceAfter=6, spaceBefore=4,
+        fontName=T_BOLD, fontSize=8.5, leading=10,
+        alignment=TA_CENTER, spaceAfter=4, spaceBefore=2,
     )
     s["table_header"] = ParagraphStyle(
         "table_header",
@@ -144,7 +144,10 @@ def make_styles():
 
 # ── Section heading helper ─────────────────────────────────────────────────────
 def section_head(num, title, S):
-    text = f"{num}.&nbsp;&nbsp;<font face='{T_BOLD}'>{title.upper()}</font>"
+    if num:
+        text = f"{num}.&nbsp;&nbsp;<font face='{T_BOLD}'>{title.upper()}</font>"
+    else:
+        text = f"<font face='{T_BOLD}'>{title.upper()}</font>"
     return Paragraph(text, S["section"])
 
 def subsection_head(label, title, S):
@@ -156,18 +159,21 @@ def hrule(width=None):
                       color=BLACK, spaceAfter=4, spaceBefore=4)
 
 # ── Figure helper ─────────────────────────────────────────────────────────────
-def figure(filename, caption_text, S, width=None):
+def figure(filename, caption_text, S, width=None, height_ratio=0.48):
+    """Single-column figure. Does NOT use KeepTogether so it flows freely."""
     path = os.path.join(FIGURES, filename)
-    w = width or (COL_W - 0.1*inch)
-    img = Image(path, width=w, height=w * 0.62, kind="proportional")
+    w = width or (COL_W - 0.05*inch)
+    img = Image(path, width=w, height=w * height_ratio, kind="proportional")
     cap = Paragraph(caption_text, S["caption"])
+    # Use KeepTogether only for caption+image to avoid orphan captions,
+    # but keep the block small enough to always fit.
     return KeepTogether([img, cap])
 
 def figure_wide(filename, caption_text, S, width=None):
-    """Figure spanning full text width (for wide plots)."""
+    """Figure spanning full text width."""
     path = os.path.join(FIGURES, filename)
     w = width or (2 * COL_W + COL_GAP - 0.1*inch)
-    img = Image(path, width=w, height=w * 0.55, kind="proportional")
+    img = Image(path, width=w, height=w * 0.45, kind="proportional")
     cap = Paragraph(caption_text, S["caption"])
     return KeepTogether([img, cap])
 
@@ -275,17 +281,17 @@ def build_story():
     story = []
 
     # ── TITLE BLOCK ──────────────────────────────────────────────────────────
-    story.append(Spacer(1, 0.1*inch))
+    story.append(Spacer(1, 0.06*inch))
     story.append(Paragraph(
         "Token-Generation Latency Benchmarking in LLaMA:<br/>"
         "Measurement, Bottleneck Attribution, and Architectural Implications",
         S["title"]
     ))
-    story.append(Spacer(1, 0.12*inch))
+    story.append(Spacer(1, 0.08*inch))
     story.append(Paragraph("Brijesh Rana, Divy Gajera, Rashmin Gajera", S["authors"]))
     story.append(Paragraph("California State University Long Beach", S["affil"]))
     story.append(Paragraph("Long Beach, CA, USA", S["affil"]))
-    story.append(Spacer(1, 0.08*inch))
+    story.append(Spacer(1, 0.05*inch))
     story.append(hrule())
 
     # ── ABSTRACT ─────────────────────────────────────────────────────────────
@@ -306,7 +312,7 @@ def build_story():
         "grows linearly with sequence length, increasing latency by 63% from 64 to 1024 tokens. "
         "float16 delivers a 1.89× speedup over float32, consistent with the 2× bandwidth "
         "reduction. We conclude with a roofline-grounded optimization proposal targeting "
-        "MLP quantization, which we estimate can reduce decode latency by 20–25%.</i>"
+        "MLP quantization, which we estimate can reduce decode latency by 25–40%.</i>"
     )
     story.append(Paragraph(abstract_text, S["abstract"]))
     story.append(Paragraph(
@@ -316,7 +322,7 @@ def build_story():
         S["index_terms"]
     ))
     story.append(hrule())
-    story.append(Spacer(1, 0.05*inch))
+    story.append(Spacer(1, 0.02*inch))
 
     # ── SECTION I: INTRODUCTION ───────────────────────────────────────────────
     story.append(section_head("I", "Introduction", S))
@@ -436,7 +442,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE I</b><br/>Hardware and Software Configuration",
                            S["caption_bold"]))
     story.append(hw_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 2))
 
     story.append(subsection_head("B.", "Models", S))
     story.append(Paragraph(
@@ -448,7 +454,7 @@ def build_story():
 
     # Model table
     model_data = [
-        [Paragraph("Model", S["table_header"]), Paragraph("Params", S["table_header"]),
+        [Paragraph("Model", S["table_header"]), Paragraph("Parameters", S["table_header"]),
          Paragraph("Layers", S["table_header"]), Paragraph("Hidden", S["table_header"]),
          Paragraph("FFN dim", S["table_header"])],
         [Paragraph("TinyLlama-1.1B", S["table_body"]), Paragraph("1.1B", S["table_body"]),
@@ -464,7 +470,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE II</b><br/>Model Architectures",
                            S["caption_bold"]))
     story.append(model_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 2))
 
     story.append(subsection_head("C.", "Measurement Methodology", S))
     story.append(Paragraph(
@@ -519,19 +525,22 @@ def build_story():
         "Aggregate statistics (median, p95, p99, standard deviation) are computed "
         "across all kept token-latency samples.", S["body"]
     ))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 2))
 
     # Timing diagram
-    story.append(figure(
-        "timing_diagram.png",
+    # Timing diagram — full column width for legibility
+    _td_w = COL_W
+    story.append(Image(os.path.join(FIGURES, "timing_diagram.png"),
+                       width=_td_w, height=_td_w * 0.75, kind="proportional"))
+    story.append(Paragraph(
         "Fig. 1. Benchmark timing methodology. Top panel: TTFT vs decode phase "
         "timeline for a representative trial. Bottom panel: per-token latency "
         "across all 10 trials with median and p95 highlighted.",
-        S, width=COL_W - 0.05*inch
+        S["caption"]
     ))
 
     # Benchmark results table
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 2))
     bench_data = [
         [Paragraph("Metric", S["table_header"]), Paragraph("Value", S["table_header"])],
         [Paragraph("TTFT (median)", S["table_body_l"]), Paragraph("27.0 ms", S["table_body"])],
@@ -547,7 +556,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE III</b><br/>Benchmark Results — TinyLlama-1.1B on MPS "
                            "(10 trials, 3 warm-up discarded)", S["caption_bold"]))
     story.append(bench_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 3))
     story.append(Paragraph(
         "The coefficient of variation of 3.7% confirms that MPS execution is "
         "highly deterministic once warm-up is complete, validating the use of "
@@ -606,7 +615,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE IV</b><br/>Per-Token Latency Decomposition — "
                            "TinyLlama-1.1B (30 decode steps)", S["caption_bold"]))
     story.append(dec_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 3))
 
     story.append(figure(
         "decomposition_pie.png",
@@ -618,7 +627,7 @@ def build_story():
         "decomposition_bar.png",
         "Fig. 3. Per-token latency decomposition across 30 decode steps shown as "
         "stacked bars. Component times are stable, confirming steady-state decoding.",
-        S, width=COL_W - 0.05*inch
+        S, width=COL_W - 0.05*inch, height_ratio=0.55
     ))
 
     story.append(subsection_head("C.", "Analysis", S))
@@ -682,7 +691,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE V</b><br/>Per-Token Decode Latency vs Context Length",
                            S["caption_bold"]))
     story.append(ctx_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 3))
 
     story.append(figure(
         "scaling_context_length.png",
@@ -748,14 +757,14 @@ def build_story():
     story.append(Paragraph("<b>TABLE VI</b><br/>float16 vs float32 Per-Token Latency "
                            "(TinyLlama-1.1B)", S["caption_bold"]))
     story.append(prec_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 3))
 
     story.append(figure(
         "scaling_precision.png",
         "Fig. 6. float16 vs float32 latency across context lengths (top) and "
         "speedup ratio float32/float16 (bottom). The ~1.89× average speedup "
         "is consistent with 2× memory-bandwidth reduction.",
-        S, width=COL_W - 0.05*inch
+        S, width=COL_W - 0.05*inch, height_ratio=0.60
     ))
     story.append(Paragraph(
         "float16 delivers a mean 1.89× speedup over float32 across all context "
@@ -848,7 +857,7 @@ def build_story():
     story.append(Paragraph("<b>TABLE VII</b><br/>Projected Latency Under MLP Quantization",
                            S["caption_bold"]))
     story.append(opt_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 3))
 
     story.append(Paragraph(
         "These estimates apply the bandwidth-reduction factor only to the MLP "
@@ -911,10 +920,11 @@ def build_story():
     ))
 
     # ── REFERENCES ────────────────────────────────────────────────────────────
+    # ColumnBreak balances last page columns before References
+    story.append(ColumnBreak())
     story.append(section_head("", "References", S))
     refs = [
-        "[1] D. Sculley <i>et al.</i>, \"Hidden Technical Debt in Machine Learning Systems,\" "
-        "<i>Advances in Neural Information Processing Systems (NeurIPS)</i>, vol. 28, 2015.",
+        "[1] J. Nielsen, <i>Usability Engineering</i>. San Francisco, CA: Morgan Kaufmann, 1993.",
 
         "[2] W. Kwon <i>et al.</i>, \"Efficient Memory Management for Large Language Model Serving "
         "with PagedAttention,\" in <i>Proc. ACM SOSP</i>, 2023.",
@@ -940,10 +950,7 @@ def build_story():
         "Post-Training Quantization for Generative Pre-trained Transformers,\" "
         "<i>arXiv preprint arXiv:2210.17323</i>, 2022.",
 
-        "[9] S. Zhang <i>et al.</i>, \"OPT: Open Pre-trained Transformer Language Models,\" "
-        "<i>arXiv preprint arXiv:2205.01068</i>, 2022.",
-
-        "[10] Z. Liu <i>et al.</i>, \"KIVI: A Tuning-Free Asymmetric 2bit Quantization for "
+        "[9] Z. Liu <i>et al.</i>, \"KIVI: A Tuning-Free Asymmetric 2bit Quantization for "
         "KV Cache,\" <i>arXiv preprint arXiv:2402.02750</i>, 2024.",
     ]
     for ref in refs:
