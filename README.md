@@ -276,7 +276,7 @@ At each decode step, only one new token is processed — the arithmetic intensit
 
 ### Finding 2: MLP feed-forward blocks are the dominant compute cost
 
-The SwiGLU MLP accounts for **28.2%** of per-token latency, followed by QKV projections at **22.4%**. Together, the linear layers (MLP + QKV + O-proj) account for **~60%** of total step time. Attention's nonlinear core (softmax, KV-cache scatter/gather) is only **8.8%** at the tested context lengths — linear projections, not attention, are the bottleneck for short-to-medium sequences.
+The SwiGLU MLP accounts for **28.2%** of per-token latency, followed by QKV projections at **22.4%**. Together the linear layers (MLP + QKV + O-proj) account for **~60%** of total step time. Attention's nonlinear core (softmax, KV-cache scatter/gather) is only **8.8%** at the tested context lengths — linear projections, not attention, are the bottleneck for short-to-medium sequences.
 
 ### Finding 3: KV-cache read cost becomes significant at long contexts
 
