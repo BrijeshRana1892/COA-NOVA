@@ -1,0 +1,13 @@
+metric,value
+backend,torch-cpu-float16
+device,cpu
+n_trials,5
+max_new_tokens,128
+ttft_median_ms,191.2233
+ttft_p95_ms,196.6084
+per_token_median_ms,49.6887
+per_token_mean_ms,51.0972
+per_token_p95_ms,57.1108
+per_token_p99_ms,86.2226
+per_token_stdev_ms,8.0440
+throughput_tokens_per_sec,20.1253

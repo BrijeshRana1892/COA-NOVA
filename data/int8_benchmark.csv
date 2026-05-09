@@ -1,0 +1,13 @@
+metric,value
+backend,torch-dynamic-int8-cpu (qnnpack)
+device,cpu
+n_trials,10
+max_new_tokens,128
+ttft_median_ms,155.8111
+ttft_p95_ms,160.5351
+per_token_median_ms,80.2758
+per_token_mean_ms,80.5252
+per_token_p95_ms,81.9455
+per_token_p99_ms,89.6651
+per_token_stdev_ms,1.5161
+throughput_tokens_per_sec,12.4571
